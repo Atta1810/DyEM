@@ -5,7 +5,8 @@ from argparse import ArgumentParser
 
 class Lorenz:
     def __init__(self,
-    
+
+                 s, r, b,
                  n_samples=10000,
                  nt = 100,
                  sample_space = 20.0):
