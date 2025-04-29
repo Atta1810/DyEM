@@ -20,7 +20,7 @@ diffusion = 1.0
 
 def ks_generator(length,name):
     # define a KS model
-    ks = KS(L=L,diffusion=diffusion,N=N,dt=dt)
+    ks = KS(L=int(L),diffusion=diffusion,N=N,dt=dt)
     # random initial condition
     #u = np.cos(x/L)*(1.0+np.sin(x/L)) # smooth IC
     u = 0.01*np.random.normal(size=N) # noisy IC
@@ -39,7 +39,7 @@ def ks_generator(length,name):
     print(f'data generated, time:{time.time()-st}') 
 
     # save data
-    save_dir = '/home/dynamical_embedding/data/ks'
+    save_dir = './data/ks'
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     if not os.path.exists(os.path.join(save_dir,name)):
