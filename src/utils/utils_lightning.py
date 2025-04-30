@@ -7,26 +7,20 @@ from lightning.pytorch.loggers import CSVLogger
 
 
 def get_callbacks(configs):
-
-    model_checkpoint = ModelCheckpoint(
-        monitor=configs.monitor,
-        mode=configs.mode,
-        save_top_k=3,
-        filename='epoch{epoch:03d}_val_loss{val_loss:.2f}',
-        auto_insert_metric_name=False,
-        save_last=True,
-    )
-
-    early_stopping = EarlyStopping(
-        monitor=configs.monitor,
-        patience=configs.patience,
-        mode=configs.mode,
-        verbose=True,
-    )
-
-    return {'model_checkpoint':model_checkpoint, 
-            'early_stopping':early_stopping}
-
+    callbacks = {}
+    if "model_checkpoint" in configs:
+        callbacks["model_checkpoint"] = ModelCheckpoint(
+            monitor=configs.model_checkpoint.monitor,  # Direct access
+            mode=configs.model_checkpoint.mode,
+            save_top_k=configs.model_checkpoint.save_top_k
+        )
+    if "early_stopping" in configs:
+        callbacks["early_stopping"] = EarlyStopping(
+            monitor=configs.early_stopping.monitor,  # Direct access
+            patience=configs.early_stopping.patience,
+            mode=configs.early_stopping.mode
+        )
+    return callbacks
 
 def get_logger(configs):
     return CSVLogger("logs", name=configs)

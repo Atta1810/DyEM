@@ -1,0 +1,58 @@
+general:
+  task_name: "regression"
+  data_name: "ks"
+  model_name: "GCN"
+  cust_name: "init3_lead1"
+  seed: 42
+  predict: True
+
+data:
+  data_name: "ks"
+  data_path: "./data/ks/AllPass/"  # Directory containing u.npy and t.npy
+  init_steps: 100   # Number of initial timesteps for input sequence
+  pred_steps: 20    # Number of steps to predict
+  n_workers: 4  # Add this line
+  in_channels: 3                   # [x, y, t] or similar
+  out_channels: 1                  # Target variable
+  batch_size: 32
+  seq_len: 100                     # Time sequence length
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+  ks_params:
+    dt: 0.25                      # Time step
+    spatial_points: 256            # Number of spatial grid points
+
+model:
+  model_name: "GCN"  # Now maps to the Model class
+  gcn:
+    in_channels: 3
+    hidden_channels: 128
+    out_channels: 1
+    num_layers: 3
+    dropout: 0.1
+
+train:
+  optimizer: "Adam"
+  criterion: "MSE"
+  weight_decay: 1e-4
+  max_epochs: 100
+  min_epochs: 10
+  accelerator: "gpu"
+  devices: [0]
+  callbacks:
+    model_checkpoint:
+      monitor: "val_loss"
+      mode: "min"
+      save_top_k: 1
+    early_stopping:
+      monitor: "val_loss"
+      patience: 10
+      mode: "min"
+  hparams:
+    lr: 1e-3  # Move learning rate here
+    gradient_clip_val: 0.5
+    track_grad_norm: 2
+
+monitor: "val_loss"  # <-- Add this line
+

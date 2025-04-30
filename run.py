@@ -15,7 +15,7 @@ from src.utils.utils_lightning import get_callbacks, get_logger
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--config", type=str, default="/home/dynamical_embedding/configs/ks/gcn/ks_gcn_init3_lead1.yaml")
+    parser.add_argument("--config", type=str, default="/home/star/coding/for_uni/AttaPaper/DyEM/configs/ks/gcn/ks_gcn_init3_lead1.yaml")
     parser.add_argument("--seed", type=str, default=42)
     parser.add_argument('--device', nargs="*", type=int, default=[0])
     args = parser.parse_args()
@@ -101,8 +101,3 @@ if __name__ == "__main__":
 
         with open(os.path.join(os.path.dirname(callbacks['model_checkpoint'].best_model_path), "config.yaml"), 'w') as f:
             yaml.dump(cfg_dict, f)
-        
-
-
-
-

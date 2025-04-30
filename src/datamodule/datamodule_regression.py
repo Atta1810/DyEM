@@ -60,75 +60,22 @@ class RegLitDataModule(L.LightningDataModule):
     def prepare_data(self):
         pass
 
-    def setup(self, stage=None):
-
-        if self.data_type == 'sliding':
-            if stage == 'fit' or stage is None:
-                train_data = np.load(os.path.join(self.data_path, 'train', 'data.npy')) 
-                self.train_dataset = data_type_dict[self.data_type](train_data, self.init_steps, self.pred_steps, self.return_last, self.predict_index)
-                self.val_data = np.load(os.path.join(self.data_path, 'val', 'data.npy'))
-                self.val_dataset = data_type_dict[self.data_type](self.val_data, self.init_steps, self.pred_steps, self.return_last, self.predict_index)
-
-            if stage == 'test' or stage is None:
-                self.test_data = np.load(os.path.join(self.data_path, 'test', 'data.npy'))
-                self.test_dataset = data_type_dict[self.data_type](self.test_data, self.init_steps, self.pred_steps, self.return_last, self.predict_index)
-            
-            if stage == 'predict' or stage is None:
-                self.predict_data = np.load(os.path.join(self.data_path, 'test', 'data.npy'))
-                self.predict_dataset = data_type_dict[self.data_type](self.predict_data, self.init_steps, self.pred_steps, self.return_last, self.predict_index)
-
-        elif self.data_type == 'target':
-            if stage == 'fit' or stage is None:
-                train_data = np.load(os.path.join(self.data_path, 'train', 'feature.npy')) 
-                train_target = np.load(os.path.join(self.data_path, 'train', 'target.npy')) 
-                self.train_dataset = RegTargetDataset(train_data, train_target)
-                self.val_data = np.load(os.path.join(self.data_path, 'val', 'feature.npy'))
-                self.val_target = np.load(os.path.join(self.data_path, 'val', 'target.npy'))
-                self.val_dataset = RegTargetDataset(self.val_data, self.val_target)
-
-            if stage == 'test' or stage is None:
-                self.test_data = np.load(os.path.join(self.data_path, 'test', 'feature.npy'))
-                self.test_target = np.load(os.path.join(self.data_path, 'test', 'target.npy'))
-                self.test_dataset = RegTargetDataset(self.test_data, self.test_target)
-
-            if stage == 'predict' or stage is None:
-                self.predict_data = np.load(os.path.join(self.data_path, 'test', 'feature.npy'))
-                self.predict_target = np.load(os.path.join(self.data_path, 'test', 'target.npy'))
-                self.predict_dataset = RegTargetDataset(self.predict_data, self.predict_target)
-
-        elif self.data_type == 'deeponet':
-            if stage == 'fit' or stage is None:
-                train_data = np.load(os.path.join(self.data_path, 'train', 'data.npy')) 
-                self.train_dataset = data_type_dict[self.data_type](train_data, self.init_steps, self.pred_steps, self.return_last, self.predict_index, self.coor_path)
-                self.val_data = np.load(os.path.join(self.data_path, 'val', 'data.npy'))
-                self.val_dataset = data_type_dict[self.data_type](self.val_data, self.init_steps, self.pred_steps, self.return_last, self.predict_index, self.coor_path)
-
-            if stage == 'test' or stage is None:
-                self.test_data = np.load(os.path.join(self.data_path, 'test', 'data.npy'))
-                self.test_dataset = data_type_dict[self.data_type](self.test_data, self.init_steps, self.pred_steps, self.return_last, self.predict_index, self.coor_path)
-            
-            if stage == 'predict' or stage is None:
-                self.predict_data = np.load(os.path.join(self.data_path, 'test', 'data.npy'))
-                self.predict_dataset = data_type_dict[self.data_type](self.predict_data, self.init_steps, self.pred_steps, self.return_last, self.predict_index, self.coor_path)
-            
-        elif self.data_type == 'ae':
-            if stage == 'fit' or stage is None:
-                train_data = np.load(os.path.join(self.data_path, 'train', 'data.npy')) 
-                self.train_dataset = data_type_dict[self.data_type](train_data)
-                self.val_data = np.load(os.path.join(self.data_path, 'val', 'data.npy'))
-                self.val_dataset = data_type_dict[self.data_type](self.val_data)
-
-            if stage == 'test' or stage is None:
-                self.test_data = np.load(os.path.join(self.data_path, 'test', 'data.npy'))
-                self.test_dataset = data_type_dict[self.data_type](self.test_data)
-            
-            if stage == 'predict' or stage is None:
-                self.predict_data = np.load(os.path.join(self.data_path, 'test', 'data.npy'))
-                self.predict_dataset = data_type_dict[self.data_type](self.predict_data)
-
-        else:
-            raise ValueError(f"Data type {self.data_type} not supported")
-
+def setup(self, stage=None):
+    # Load raw data
+    u = np.load(os.path.join(self.data_path, "u.npy"))  # Shape: [n_samples, spatial, temporal]
+    t = np.load(os.path.join(self.data_path, "t.npy"))  # Time steps
+    
+    # Split data into train/val/test
+    n_samples = u.shape[0]
+    train_end = int(n_samples * self.train_ratio)
+    val_end = train_end + int(n_samples * self.val_ratio)
+    
+    self.train_data = u[:train_end]
+    self.val_data = u[train_end:val_end]
+    self.test_data = u[val_end:]
+    
+    # Store time steps if needed
+    self.t = t
     def train_dataloader(self):
         return torch.utils.data.DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=self.n_workers)
     

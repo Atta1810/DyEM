@@ -2,12 +2,12 @@ import torch
 import torch.nn as nn
 import numpy as np
 from ..layers.deeponet_components import *
-
+from .CNN2d import CNN2d  # Import the 2D CNN class
 
 
 branch_dict = {
     'mlp': MLP,
-    'cnn': CNN
+    'cnn2d': CNN2d
 }
 
 trunk_dict = {  
