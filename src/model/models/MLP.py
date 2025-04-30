@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 
-class Model(nn.Module):
+class MLP(nn.Module):
     def __init__(self, cfg):
         super().__init__()
         self.input_dim = cfg.input_dim

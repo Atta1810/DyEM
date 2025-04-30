@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 
-class Model(nn.Module):
+class CNN2d(nn.Module):
     def __init__(self, cfg):
         super().__init__()
         self.in_channels = cfg.in_channels

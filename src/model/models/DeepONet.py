@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 from ..layers.deeponet_components import *
+from .CNN2d import CNN2d  # Import the 2D CNN class
 
 
 

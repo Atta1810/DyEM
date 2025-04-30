@@ -1,20 +1,18 @@
-import torch
+# src/model/models/FNO.py
 import torch.nn as nn
-
-from ..layers.fno_components.models.fno import FNO
-
+from src.model.layers.fno_components import FNO  # Absolute import
 
 class Model(nn.Module):
     def __init__(self, cfg):
         super().__init__()
-        self.n_modes = cfg.n_modes
-        self.in_channels = cfg.in_channels
-        self.hidden_channels = cfg.hidden_channels   
-        self.out_channels = cfg.out_channels
-        self.model = FNO(n_modes=(self.n_modes),
-                         hidden_channels=self.hidden_channels,
-                         in_channels=self.in_channels,
-                         out_channels=self.out_channels)
+        self.model = FNO(
+            in_channels=cfg.in_channels,
+            out_channels=cfg.out_channels,
+            n_modes=cfg.n_modes,
+            hidden_channels=cfg.hidden_channels
+        )
 
     def forward(self, x):
+        if x.dim() == 3:  # Fixed typo: din() -> dim()
+            x = x.unsqueeze(-1)
         return self.model(x)

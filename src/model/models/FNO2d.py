@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from ..layers.fno_components.models.fno import FNO
+from ..layers.fno_components import FNO  # ✅ Correct path
 
 
 class Model(nn.Module):
